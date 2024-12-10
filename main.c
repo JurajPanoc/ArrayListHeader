@@ -3,41 +3,38 @@
 #include "list.h"
 
 
-init_list(int)
-init_list(char)
-init_list(str)
+add_base_func(int, "%d")
+add_base_func(char, "'%c'")
+add_base_func(str, "\"%s\"")
 
-void outside_scope(list_str* z){
-    print_list(z, "%s");
-}
 
 int main(){
-    list_ctor(x, int);
-    list_ctor(y, char);
-    list_ctor(z, str);
+    List* ints = list_ctor(int);
+    List* chars = list_ctor(char);
+    List* words = list_ctor(str);
 
-    append(z, "Hello");
-    append(z, "World");
+    for(int i = 0; i < 5; i++){
+        append_int(ints, i);
+        append_char(chars, i + 'a');
+    }
 
-    outside_scope(z);
+    append_str(words, "Hello, ");
+    append_str(words, "world");
 
-    append(x, 4);
-    append(x, 1);
-    append(x, 7);
+    print_list_char(chars);
+    print_list_int(ints);
+    print_list_str(words);
 
-    append(y, 'a');
-    append(y, 'h');
-    append(y, 'a');
+    pop_int(ints);
+    pop_char(chars);
+    pop_str(words);
 
-    char res = pop(y); //fix this buggy c extention behavior (compiler is fine with it just the extention doesn't like it)
-    
-    printf("popped item: %c\n", res);
-    print_list(x, "%d");
-    print_list(y, "%c");
-    print_list(z, "%s");
-    
-    list_dtor(x);
-    list_dtor(y);
-    list_dtor(z);
+    print_list_char(chars);
+    print_list_int(ints);
+    print_list_str(words);
+
+    list_dtor(&ints);
+    list_dtor(&chars);
+    list_dtor(&words);
     return 0;
 }
