@@ -22,30 +22,32 @@ typedef struct list_h {
     void* data; //the array itself, contains the items 
 } List;
 
-//string type (char*) because of the list_"type" naming scheme 
-//(list_char* is an invalid typedef name)
+//string type (char*) because of the "function name"_"type" naming scheme 
+//(for example: append_char* is an invalid function name)
 typedef char* str;
 
 ///////////////////
 //      QOL      //////////////////////////////////////////////////////////////////////////////////
 ///////////////////
 
-//alternate syntax for accessing array elements (no "name->data[index]" needed)
+//alternate syntax for accessing array elements (no "((type*)name->data)[index]" needed)
 #define iget(name, type, index) (((type*)name->data)[index])
 
-#define printerr(msg) fprintf(stderr, msg)
+//prints an error message to stderr 
+#define printerr(msg) fprintf(stderr, msg "\n")
 
 /////////////////////////
 // list base "methods" ////////////////////////////////////////////////////////////////////////////
 /////////////////////////
 
-/*
-* macro that calls other macros that initialize the base functions for list manipulation
-*/
+//macro that calls other macros that initialize the base functions for list manipulation
+
 #define add_base_func(type, format_str) \
 add_print_list(type, format_str) \
 add_append(type) \
 add_pop(type) \
+add_insert(type) \
+add_remove(type) \
 
 
 /*
@@ -116,6 +118,46 @@ type pop_##type(List *list){ \
     } \
     list->len--; \
     return ((type*)list->data)[list->len]; \
+}
+
+
+/*
+* inserts an item into the array at the index that is passed in
+  and pushes all of the items in front of it,
+* if you pass in an index thats out of range it throws an error and kills the program
+* if you want to add to the end of the list use append_"type" instead
+*/
+#define add_insert(type) \
+void insert_##type(List* list, const unsigned int index, const type item) { \
+    if(index > list->len - 1) { \
+        printerr("Invalid insert operation, index out of range"); \
+        exit(EXIT_FAILURE); \
+    } \
+    if(list->size <= list->len) { \
+        list_reallocator(list, type) \
+    } \
+    for(size_t i = list->len - 1; i + 1 > index; i--) { \
+        ((type*)list->data)[i + 1] = ((type*)list->data)[i]; \
+    } \
+    ((type*)list->data)[index] = item; \
+    list->len++; \
+}
+
+
+/*
+* removes an item at the give index and moves all of the items to fill in the gap left behind
+* if you pass in an index thats out of range it throws an error and kills the program
+*/
+#define add_remove(type) \
+void remove_##type(List* list, const unsigned int index) { \
+    if(index > list->len - 1) { \
+        printerr("Invalid remove operation, index out of range"); \
+        exit(EXIT_FAILURE); \
+    } \
+    for(size_t i = index; i + 1 < list->len; i++) { \
+        ((type*)list->data)[i] = ((type*)list->data)[i + 1]; \
+    } \
+    list->len--; \
 }
 
 
