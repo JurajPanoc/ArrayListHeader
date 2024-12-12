@@ -9,7 +9,7 @@
 #ifndef __LIST__H //include guarding
 #define __LIST__H
 
-#define DEFAULT_SIZE 10 //default list size
+#define DEFAULT_SIZE 10 //default List size
 
 //////////////////
 // custom types ///////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ typedef struct list_h {
 } List;
 
 //string type (char*) because of the "function name"_"type" naming scheme 
-//(for example: append_char* is an invalid function name)
+//(for example: append_char*() is an invalid function name)
 typedef char* str;
 
 ///////////////////
@@ -61,7 +61,7 @@ List *list_ctor_(size_t type_size);
 
 /*
 * deallocates the memory tied to the list that is passed in,
-* sets its pointer to NULL to prevent accidental use,
+* sets its pointer to NULL to prevent accidental use
 */
 void list_dtor(List **list_ptr);
 

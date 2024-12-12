@@ -2,21 +2,24 @@
 #include <stdlib.h>
 #include "list.h"
 
-
+//TODO: add an initializer with the possibility of copying in preexisting arrays
 add_base_func(int, "%d")
 add_base_func(char, "'%c'")
 add_base_func(str, "\"%s\"")
 
+
+#define TEST_ARGS List* int_list, List* char_list, List* str_list
+
 //tests
-void test_append(List* ints, List* chars, List* words);
+void test_append(TEST_ARGS);
 
-void test_print(List* int_list, List* char_list, List* str_list);
+void test_print(TEST_ARGS);
 
-void test_insert(List* int_list, List* char_list, List* str_list);
+void test_insert(TEST_ARGS);
 
-void test_pop(List* int_list, List* char_list, List* str_list);
+void test_pop(TEST_ARGS);
 
-void test_remove(List* int_list, List* char_list, List* str_list);
+void test_remove(TEST_ARGS);
 
 
 int main(){
@@ -39,7 +42,7 @@ int main(){
 }
 
 
-void test_append(List* int_list, List* char_list, List* str_list){
+void test_append(TEST_ARGS){
     puts("append test");
     for(int i = 0; i < 12; i++){
         append_int(int_list, i);
@@ -53,7 +56,7 @@ void test_append(List* int_list, List* char_list, List* str_list){
 }
 
 
-void test_insert(List* int_list, List* char_list, List* str_list){
+void test_insert(TEST_ARGS){
     puts("insert test");
     insert_int(int_list, 1, 5);
     insert_char(char_list, 1, 'A');
@@ -63,7 +66,7 @@ void test_insert(List* int_list, List* char_list, List* str_list){
 }
 
 
-void test_pop(List* int_list, List* char_list, List* str_list){
+void test_pop(TEST_ARGS){
     puts("pop test");
     pop_int(int_list);
     pop_char(char_list);
@@ -73,7 +76,7 @@ void test_pop(List* int_list, List* char_list, List* str_list){
 }
 
 
-void test_remove(List* int_list, List* char_list, List* str_list){
+void test_remove(TEST_ARGS){
     puts("remove test");
     remove_int(int_list, 1);
     remove_char(char_list, 1);
@@ -83,7 +86,7 @@ void test_remove(List* int_list, List* char_list, List* str_list){
 }
 
 
-void test_print(List* int_list, List* char_list, List* str_list){
+void test_print(TEST_ARGS){
     printf("char arr len %ld\n", char_list->len);
     printf("char arr size %ld\n", char_list->size);
 
