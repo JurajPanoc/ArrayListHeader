@@ -40,14 +40,21 @@ typedef char* str;
 // list base "methods" ////////////////////////////////////////////////////////////////////////////
 /////////////////////////
 
-//macro that calls other macros that initialize the base functions for list manipulation
+/*
+ * macro that calls other macros that initialize the base functions for list manipulation,
+ * type is the type of data you would like to store,
+ * format_str is a string that determines how the array will be printed (formatting just like in printf),
+ * cmp_func is a function pointer that determines how the arrays content will be compared (example: strcmp() in <string.h>)
+*/
 
-#define add_base_func(type, format_str) \
+#define add_base_func(type, format_str, cmp_func) \
 add_print_list(type, format_str) \
 add_append(type) \
 add_pop(type) \
 add_insert(type) \
 add_remove(type) \
+add_find(type, cmp_func) \
+add_map(type) \
 
 
 /*
@@ -68,13 +75,13 @@ void list_dtor(List **list_ptr);
 
 /*
 * prints out the data that is in the list,
-* format_str sets the way it is printed (the way the type is interpretted)
+* printf_macro sets the way it is printed (gets called with the index as a parameter)
 */
-#define add_print_list(type, format_str) \
+#define add_print_list(type, printf_macro) \
 void print_list_##type(List *list){ \
     printf("["); \
     for(size_t i = 0; i < list->len; i++){ \
-        printf(format_str, ((type*)list->data)[i]); \
+        printf_macro(i); \
         printf(", "); \
     } \
     printf("]\n"); \
@@ -160,5 +167,27 @@ void remove_##type(List* list, const unsigned int index) { \
     list->len--; \
 }
 
+/*
+* finds the item that is passed in according to the criteria defined in the cmp_func,
+* returns the items index,
+* if not found returns -1
+*/
+#define add_find(type, cmp_func) \
+int find_##type(List* list, type item) { \
+    for(size_t i = 0; i < list->len; i++) { \
+        if (cmp_func(iget(list, type, i), item) == 0){ \
+            return i; \
+        } \
+    } \
+    return -1; \
+}
+
+
+#define add_map(type) \
+void map_##type(const List* list, void(*func)(type*)) { \
+    for(size_t i = 0; i < list->len; i++) { \
+        func(&iget(list, type, i)); \
+    } \
+}
 
 #endif //final endif
