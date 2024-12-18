@@ -18,18 +18,25 @@ int struct_cmp(TestStruct x, TestStruct y) {return x.num - y.num;}
 void multiply(int* i) {*i *= 2;}
 void capitalize(char* i) {*i -= 32;}
 
+int filter_for_int(int x){return x < 5;}
+int filter_for_char(char x){return x >= 'A' && x <= 'F';}
+int filter_for_str(str x){return x[0] == 'H';}
+int filter_for_struct(TestStruct x){return x.num <= 15;}
+
+
 // define the way the print_list_type function will print out the type
 // TODO: make this less painful to set up
-#define print_int(i) printf("%d", ((int*)list->data)[i]);
-#define print_char(i) printf("'%c'", ((char*)list->data)[i]);
-#define print_str(i) printf("\"%s\"", ((str*)list->data)[i]);
-#define print_test_struct(i) printf("num: %d name: \"%s\"", ((TestStruct*)list->data)[i].num, ((TestStruct*)list->data)[i].name);
+#define print_int(i) printf("%d", iget(list, int, i));
+#define print_char(i) printf("'%c'", iget(list, char, i));
+#define print_str(i) printf("\"%s\"", iget(list, str, i));
+#define print_test_struct(i) printf("(num: %d, name: \"%s\")", \
+                                    iget(list, TestStruct, i).num, iget(list, TestStruct, i).name);
 
 
-//TODO: add an initializer with the possibility of copying in preexisting arrays
+// TODO: add an initializer with the possibility of copying in preexisting arrays
 add_base_func(int, print_int, int_cmp)
 add_base_func(char, print_char, char_cmp)
-add_base_func(str, print_str, strcmp)
+add_base_func(str, print_str, strcmp) //strings are static, cannot be modified
 add_base_func(TestStruct, print_test_struct, struct_cmp)
 
 // only used for the ease of writing new test functions
@@ -50,6 +57,8 @@ void test_find(TEST_ARGS);
 
 void test_map(TEST_ARGS);
 
+void test_filter(TEST_ARGS);
+
 
 int main(){
     List* ints = list_ctor(int);
@@ -69,6 +78,8 @@ int main(){
     test_find(ints, chars, words, structs);
 
     test_map(ints, chars, words, structs);
+
+    test_filter(ints, chars, words, structs);
 
     list_dtor(&ints);
     list_dtor(&chars);
@@ -142,6 +153,7 @@ void test_print(TEST_ARGS){
 
 
 void test_find(TEST_ARGS){
+    puts("find test");
     int FIND_NUM = 5;
     char FIND_CH = 'o';
     char* FIND_ST = "Hello, ";
@@ -158,8 +170,24 @@ void test_find(TEST_ARGS){
 }
 
 void test_map(TEST_ARGS){
+    puts("map test");
     map_int(int_list, multiply);
     map_char(char_list, capitalize);
 
     test_print(int_list, char_list, str_list, struct_list);
+}
+
+void test_filter(TEST_ARGS){
+    puts("filter test");
+    List* filtered_int = filter_int(int_list, filter_for_int);
+    List* filtered_char = filter_char(char_list, filter_for_char);
+    List* filtered_str = filter_str(str_list, filter_for_str);
+    List* filtered_struct = filter_TestStruct(struct_list, filter_for_struct);
+
+    test_print(filtered_int, filtered_char, filtered_str, filtered_struct);
+
+    list_dtor(&filtered_int);
+    list_dtor(&filtered_char);
+    list_dtor(&filtered_str);
+    list_dtor(&filtered_struct);
 }

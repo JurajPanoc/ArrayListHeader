@@ -55,28 +55,29 @@ add_insert(type) \
 add_remove(type) \
 add_find(type, cmp_func) \
 add_map(type) \
+add_filter(type) \
 
 
 /*
-* macro that calls a fuction that returns a pointer to a struct named List,
-* struct is allocated on the heap that constains the array of items of the type specified,
-*/
-#define list_ctor(type) list_ctor_(sizeof(type))
+ * macro that calls a fuction that returns a pointer to a struct named List,
+ * struct is allocated on the heap that constains the array of items of the type specified,
+ */
+#define list_ctor(type) list_ctor_(sizeof(type), DEFAULT_SIZE)
 
-List *list_ctor_(size_t type_size);
+List *list_ctor_(size_t type_size, size_t size);
 
 
 /*
-* deallocates the memory tied to the list that is passed in,
-* sets its pointer to NULL to prevent accidental use
-*/
+ * deallocates the memory tied to the list that is passed in,
+ * sets its pointer to NULL to prevent accidental use
+ */
 void list_dtor(List **list_ptr);
 
 
 /*
-* prints out the data that is in the list,
-* printf_macro sets the way it is printed (gets called with the index as a parameter)
-*/
+ * prints out the data that is in the list,
+ * printf_macro sets the way it is printed (gets called with the index as a parameter)
+ */
 #define add_print_list(type, printf_macro) \
 void print_list_##type(List *list){ \
     printf("["); \
@@ -89,9 +90,9 @@ void print_list_##type(List *list){ \
 
 
 /*
-* macro that doubles the size of the array and reallocates the memory,
-* crashes the program if the reallocation failed
-*/
+ * macro that doubles the size of the array and reallocates the memory,
+ * crashes the program if the reallocation failed
+ */
 #define list_reallocator(list, type) \
     list->size *= 2; \
     list->data = realloc(list->data, list->size * sizeof(type)); \
@@ -99,9 +100,9 @@ void print_list_##type(List *list){ \
 
 
 /*
-* adds an item to the end of the array and increments its length,
-* if its about to exceed its size then it reallocs a new bigger array
-  and updates its pointer to point to the new array
+ * adds an item to the end of the array and increments its length,
+ * if its about to exceed its size then it reallocs a new bigger array
+   and updates its pointer to point to the new array
 */
 #define add_append(type) \
 void append_##type(List *list, type item){ \
@@ -113,9 +114,9 @@ void append_##type(List *list, type item){ \
 
 
 /*
-* pops the last item out and decrements the length variable,
-* if the list is empty then it prints "list is empty, cant pop more items" 
-  to stderr and crashes the program
+ * pops the last item out and decrements the length variable,
+ * if the list is empty then it prints "list is empty, cant pop more items" 
+   to stderr and crashes the program
 */
 #define add_pop(type) \
 type pop_##type(List *list){ \
@@ -129,11 +130,11 @@ type pop_##type(List *list){ \
 
 
 /*
-* inserts an item into the array at the index that is passed in
-  and pushes all of the items in front of it,
-* if you pass in an index thats out of range it throws an error and kills the program
-* if you want to add to the end of the list use append_"type" instead
-*/
+ * inserts an item into the array at the index that is passed in
+   and pushes all of the items in front of it,
+ * if you pass in an index thats out of range it throws an error and kills the program
+ * if you want to add to the end of the list use append_"type" instead
+ */
 #define add_insert(type) \
 void insert_##type(List* list, const unsigned int index, const type item) { \
     if(index > list->len - 1) { \
@@ -152,9 +153,9 @@ void insert_##type(List* list, const unsigned int index, const type item) { \
 
 
 /*
-* removes an item at the give index and moves all of the items to fill in the gap left behind
-* if you pass in an index thats out of range it throws an error and kills the program
-*/
+ * removes an item at the give index and moves all of the items to fill in the gap left behind
+ * if you pass in an index thats out of range it throws an error and kills the program
+ */
 #define add_remove(type) \
 void remove_##type(List* list, const unsigned int index) { \
     if(index > list->len - 1) { \
@@ -168,10 +169,10 @@ void remove_##type(List* list, const unsigned int index) { \
 }
 
 /*
-* finds the item that is passed in according to the criteria defined in the cmp_func,
-* returns the items index,
-* if not found returns -1
-*/
+ * finds the item that is passed in according to the criteria defined in the cmp_func,
+ * returns the items index,
+ * if not found returns -1
+ */
 #define add_find(type, cmp_func) \
 int find_##type(List* list, type item) { \
     for(size_t i = 0; i < list->len; i++) { \
@@ -188,6 +189,23 @@ void map_##type(const List* list, void(*func)(type*)) { \
     for(size_t i = 0; i < list->len; i++) { \
         func(&iget(list, type, i)); \
     } \
+}
+
+
+/*
+ * creates a new list that contains the items that satisfy the condition criteria,
+ * returns a pointer to the new list
+ */
+#define add_filter(type) \
+List* filter_##type(List* list, int(*condition)(type)) { \
+    List* res = list_ctor_(sizeof(type), list->len); \
+    for(size_t i = 0; i < list->len; i++){ \
+        if(condition(iget(list, type, i))) { \
+            iget(res, type, res->len) = iget(list, type, i); \
+            res->len++; \
+        } \
+    } \
+    return res; \
 }
 
 #endif //final endif

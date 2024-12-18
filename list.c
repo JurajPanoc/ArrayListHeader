@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//default size of the List array
-#define DEFAULT_SIZE 10
 
 typedef struct list_h {
     size_t size; // size of the array in memory measured in slots, can change at runtime, defaults to 10
@@ -11,14 +9,14 @@ typedef struct list_h {
 } List;
 
 
-List* list_ctor_(size_t type_size){
+List* list_ctor_(size_t type_size, size_t size){
     List *list = malloc(sizeof(List));
     if(list == NULL) exit(EXIT_FAILURE);
     
-    list->data = malloc(type_size * DEFAULT_SIZE);
+    list->data = malloc(type_size * size);
     if(list->data == NULL) exit(EXIT_FAILURE);
     
-    list->size = DEFAULT_SIZE;
+    list->size = size;
     list->len = 0;
     return list;
 }
